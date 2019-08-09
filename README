@@ -1,0 +1,71 @@
+Tlogdb is a trivial transparent log client and server. It is meant as more a
+starting point to be customized than a tool to be used directly.
+
+A transparent log is a tamper-proof, append-only, immutable log of data
+records. That is, if the server were to violate the “append-only, immutable”
+properties, that tampering would be detected by the client. For more about
+transparent logs, see https://research.swtch.com/tlog.
+
+
+Server Operations
+
+To create a new log (new server state):
+
+    tlogdb [-f file] newlog $servername
+
+The newlog command creates a new database in file (default tlog.db)
+containing an empty log and a newly generated public/private key pair for
+the server using the given name.
+
+The newlog command prints the newly generated public key. To see it again:
+
+    tlogdb [-f file] publickey
+
+To add a record named name to the log:
+
+    cat data | tlogdb [-f file] add name
+
+To serve the authenticated log data:
+
+    tlogdb [-a addr] [-f file] serve
+
+The default server address is localhost:6655.
+
+
+Client Operations
+
+The client maintains a cache database both for performance (avoiding
+duplicate downloads) and for storing the server's public key and the most
+recently seen log head.
+
+To create a new client cache:
+
+    tlogdb [-c file] newcache key
+
+The newcache command creates a new database in file (default tlogclient.db)
+and stores the given public key for later use. The key should be the output
+of the tlogdb's server commands newlog or publickey, described above.
+
+To look up a record in the log:
+
+    tlogdb [-a addr] [-c file] lookup name
+
+The default server address is again localhost:6655.
+
+
+Example
+
+Putting the various commands together in a Unix shell:
+
+    rm -f tlog.db tlogclient.db
+    go build
+
+    ./tlogdb newlog myname
+    ./tlogdb publickey
+    echo hello world | ./tlogdb add greeting
+    ./tlogdb serve &
+
+    ./tlogdb newcache $(./tlogdb publickey)
+    ./tlogdb lookup greeting
+
+    kill $!
