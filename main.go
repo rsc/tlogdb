@@ -57,6 +57,16 @@
 //
 // The default server address is again localhost:6655.
 //
+// HTTP Protocol
+//
+// The protocol between client and server is the same as used in
+// the Go module checksum database, documented at
+// https://golang.org/design/25530-sumdb#checksum-database.
+//
+// There are three endpoints: /latest serves a signed tree head;
+// /lookup/NAME looks up the given name,
+// and /tile/* serves log tiles.
+//
 // Example
 //
 // Putting the various commands together in a Unix shell:
