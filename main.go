@@ -33,9 +33,9 @@
 //
 // To serve the authenticated log data:
 //
-//	tlogdb [-a addr] [-f file] serve
+//	tlogdb [-u url] [-f file] serve
 //
-// The default server address is localhost:6655.
+// The default server url is http://localhost:6655.
 //
 // Client Operations
 //
@@ -53,9 +53,9 @@
 //
 // To look up a record in the log:
 //
-//	tlogdb [-a addr] [-c file] lookup name
+//	tlogdb [-u url] [-c file] lookup name
 //
-// The default server address is again localhost:6655.
+// The default server URL is http://localhost:6655.
 //
 // HTTP Protocol
 //
@@ -96,6 +96,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -108,7 +109,7 @@ import (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `usage: tlogdb [-a addr] [-c cache] [-f db] cmd [args...]
+	fmt.Fprintf(os.Stderr, `usage: tlogdb [-u url] [-c cache] [-f db] cmd [args...]
 
 Server Commands:
 	newlog <server-name>
@@ -124,9 +125,9 @@ Client Commands:
 }
 
 var (
-	serverDB   = flag.String("f", "tlog.db", "store server database in `file`")
-	serverAddr = flag.String("a", "localhost:6655", "server runs on `addr`")
-	clientDB   = flag.String("c", "tlogclient.db", "store local client database in `file`")
+	serverDB  = flag.String("f", "tlog.db", "store server database in `file`")
+	serverURL = flag.String("u", "http://localhost:6655", "server listens to `url` (http only)")
+	clientDB  = flag.String("c", "tlogclient.db", "store local client database in `file`")
 )
 
 func main() {
@@ -197,8 +198,14 @@ func main() {
 		for _, path := range sumdb.ServerPaths {
 			http.Handle(path, srv)
 		}
-		http.ListenAndServe(*serverAddr, nil)
-
+		u, err := url.Parse(*serverURL)
+		if err != nil {
+			log.Fatalf("unable to parse URL %v", *serverURL)
+		}
+		if u.Scheme != "http" {
+			log.Fatal("server only supports http://")
+		}
+		http.ListenAndServe(u.Host, nil)
 	case "newcache":
 		if len(args) != 2 {
 			usage()
@@ -248,7 +255,7 @@ func NewClientCache() *clientCache {
 }
 
 func (c *clientCache) ReadRemote(path string) ([]byte, error) {
-	resp, err := http.Get("http://" + *serverAddr + path)
+	resp, err := http.Get(*serverURL + path)
 	if err != nil {
 		return nil, err
 	}
