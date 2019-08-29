@@ -27,9 +27,9 @@ To add a record named name to the log:
 
 To serve the authenticated log data:
 
-    tlogdb [-a addr] [-f file] serve
+    tlogdb [-u url] [-f file] serve
 
-The default server address is localhost:6655.
+The default server url is http://localhost:6655.
 
 
 Client Operations
@@ -48,9 +48,9 @@ of the tlogdb's server commands newlog or publickey, described above.
 
 To look up a record in the log:
 
-    tlogdb [-a addr] [-c file] lookup name
+    tlogdb [-u url] [-c file] lookup name
 
-The default server address is again localhost:6655.
+The default server url is again http://localhost:6655.
 
 
 Example
