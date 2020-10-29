@@ -3,8 +3,9 @@
 // license that can be found in the LICENSE file.
 
 // Package sumdb implements the HTTP protocols for serving or accessing
-// a generalized checksum database. This package is forked from
-// golang.org/x/mod/sumdb.
+// a generalized checksum database. This package is a generalization of
+// golang.org/x/mod/sumdb and is compatible with that database
+// but no longer limited to Go modules.
 package sumdb
 
 import (

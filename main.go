@@ -104,7 +104,7 @@ import (
 	"golang.org/x/mod/sumdb/tlog"
 	_ "rsc.io/sqlite"
 	"rsc.io/tlogdb/internal/database"
-	"rsc.io/tlogdb/internal/sumdb"
+	"rsc.io/tlogdb/sumdb"
 )
 
 func usage() {
